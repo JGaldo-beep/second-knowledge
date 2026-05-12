@@ -30,6 +30,15 @@ async def start(update: Update, context):
 async def handle_message(update: Update, context):
     message = update.message
     user_id = message.from_user.id
+
+    redis_key = f"rate_limit:{user_id}"
+    requests = await r.incr(redis_key)
+    if requests == 1:
+        await r.expire(redis_key, 60)
+
+    if requests > 5:
+        await message.reply_text("⚠️ Estás enviando mensajes muy rápido. Por favor, espera un minuto para cuidar los créditos de la IA.")
+        return
     
     # 1. Creamos el paquete. Añadimos is_voice para ayudar al Worker
     job_data = {
