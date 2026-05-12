@@ -15,8 +15,8 @@ load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-r = redis.Redis(host=REDIS_HOST, port=6379, db=0, decode_responses=True)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
+r = redis.from_url(REDIS_URL, decode_responses=True)
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
