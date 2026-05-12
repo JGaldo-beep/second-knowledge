@@ -11,7 +11,7 @@ from datetime import datetime
 from storage import save_to_github, get_from_github
 from agent import analyze_knowledge, answer_question_with_context
 
-from database import init_db, save_message, get_chat_history
+from database import init_db, save_message, get_chat_history, get_all_topics
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 r = redis.from_url(REDIS_URL, decode_responses=True)
@@ -88,7 +88,9 @@ async def process_job(job_data: dict):
 
         historial = await get_chat_history(user_id, limit=5)
 
-        metadata = await analyze_knowledge(entry.core_content, chat_history=historial)
+        temas_existentes = get_all_topics()
+
+        metadata = await analyze_knowledge(entry.core_content, chat_history=historial, available_topics=temas_existentes)
 
         print(f"📊 Análisis del Agente:")
         print(f"   - Acción: {metadata.action}")

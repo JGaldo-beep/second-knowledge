@@ -50,3 +50,13 @@ def get_from_github(topic: str):
     except Exception:
         # Si el archivo no existe, devuelve None
         return None
+    
+def get_all_topics():
+    """Obtiene la lista de todos los temas (archivos .md) existentes en el repositorio."""
+    repo = g.get_repo(repo_name)
+    try:
+        contents = repo.get_contents("")
+        return [file.name.replace('.md', '') for file in contents if file.name.endswith('.md')]
+    except Exception as e:
+        print(f"Error obteniendo temas: {e}")
+        return []

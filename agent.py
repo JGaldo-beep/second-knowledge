@@ -21,18 +21,25 @@ class KnowledgeMetadata(BaseModel):
         description="¿Qué debemos hacer con esto? Opciones: 'save' (es útil para la base de conocimientos), 'discard' (es basura o spam), 'ask_user' (si es un comando o pregunta directa)."
     )
 
-async def analyze_knowledge(core_content: str, chat_history: list = None) -> KnowledgeMetadata:
+async def analyze_knowledge(core_content: str, chat_history: list = None, available_topics: list = None) -> KnowledgeMetadata:
     """Envía el contenido al LLM con su contexto histórico y fuerza una respuesta estructurada."""
     
-    prompt_sistema = """
+    temas_str = ", ".join(available_topics) if available_topics else "Ninguno todavía"
+    
+    prompt_sistema = f"""
     Eres el Agente Orquestador de un sistema de "Segundo Cerebro" (Knowledge Base).
     Tu objetivo es analizar el contenido que el usuario ha guardado y clasificarlo meticulosamente.
     IMPORTANTE: Ten en cuenta el historial de conversación para entender el contexto.
     
+    ARCHIVOS/TEMAS EXISTENTES EN TU CEREBRO DIGITAL: [{temas_str}]
+    
+    REGLAS ESTRICTAS PARA EL TOPIC:
+    - Si el usuario te hace una pregunta o pide buscar algo ('ask_user'), DEBES usar EXACTAMENTE uno de los temas de la lista de arriba que más se relacione. NO inventes temas nuevos al buscar.
+    - Si el usuario envía información nueva ('save'), puedes usar un tema existente o inventar uno nuevo si el contenido no encaja en los actuales.
+    
     REGLAS ESTRICTAS PARA LA ACCIÓN:
-    - Usa 'save' SOLAMENTE si el usuario te envía artículos, notas, ideas, código o enlaces para guardar.
-    - Usa 'ask_user' SIEMPRE que el usuario te haga una pregunta conversacional, te salude, te pida buscar algo en su base de conocimientos, o te dé una instrucción directa (ej. "ayúdame con esto", "búscame tal cosa", "¿qué opinas de...").
-    - Usa 'discard' si es un mensaje de error, un saludo vacío sin contexto o texto incomprensible.
+    - Usa 'save' SOLAMENTE si el usuario te envía notas, ideas, código o enlaces para guardar.
+    - Usa 'ask_user' SIEMPRE que el usuario te haga una pregunta conversacional o te pida buscar algo.
     """
 
     messages = [{"role": "system", "content": prompt_sistema}]
