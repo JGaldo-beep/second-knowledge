@@ -46,10 +46,3 @@ urllib3==2.7.0
 fastapi
 uvicorn
 python-telegram-bot[webhooks]
-python-dotenv
-openai
-pydantic
-httpx
-trafilatura
-redis
-aiosqlite
