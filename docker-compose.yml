@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: bot_redis
+    restart: always
+
+  bot_api:
+    build: .
+    container_name: bot_api
+    depends_on:
+      - redis
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app 
+    restart: always
+
+  worker:
+    build: .
+    container_name: bot_worker
+    depends_on:
+      - redis
+    env_file: .env
+    command: python worker.py
+    volumes:
+      - .:/app
+    restart: always
