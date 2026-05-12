@@ -50,3 +50,24 @@ async def analyze_knowledge(core_content: str, chat_history: list = None) -> Kno
     )
     
     return completion.choices[0].message.parsed
+
+async def answer_question_with_context(question: str, knowledge_context: str) -> str:
+    """Genera una respuesta basada en las notas leídas de GitHub."""
+    prompt = f"""
+    Eres un asistente inteligente de un 'Segundo Cerebro'. 
+    Responde a la pregunta del usuario utilizando ÚNICAMENTE el siguiente contexto de sus notas guardadas.
+    Si la respuesta no está en estas notas, indícalo amablemente.
+
+    NOTAS GUARDADAS DEL USUARIO:
+    {knowledge_context}
+    """
+    
+    completion = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": question}
+        ],
+        temperature=0.2
+    )
+    return completion.choices[0].message.content

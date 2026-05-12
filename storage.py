@@ -38,3 +38,15 @@ def save_to_github(topic: str, tags: list, summary: str, original_content: str, 
             content=initial_content
         )
         print(f"✨ Archivo {file_path} creado exitosamente.")
+
+def get_from_github(topic: str):
+    """Busca y lee un archivo Markdown en el repositorio de GitHub."""
+    repo = g.get_repo(repo_name)
+    file_path = f"{topic}.md"
+    
+    try:
+        contents = repo.get_contents(file_path)
+        return contents.decoded_content.decode("utf-8")
+    except Exception:
+        # Si el archivo no existe, devuelve None
+        return None

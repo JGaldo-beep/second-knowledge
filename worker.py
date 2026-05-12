@@ -8,9 +8,8 @@ from dotenv import load_dotenv
 from processors import process_voice, process_image, process_url
 from models import NormalizedEntry
 from datetime import datetime
-from agent import analyze_knowledge
-
-from storage import save_to_github
+from storage import save_to_github, get_from_github
+from agent import analyze_knowledge, answer_question_with_context
 
 from database import init_db, save_message, get_chat_history
 
@@ -103,7 +102,17 @@ async def process_job(job_data: dict):
             respuesta_final = "*Contenido descartado:* No parece ser útil para la base de conocimientos."
             
         elif metadata.action == 'ask_user':
-            respuesta_final = f"Dime, ¿en qué te puedo ayudar? (Tema detectado: {metadata.topic})"
+            print(f"🔍 Buscando notas en GitHub sobre el tema: {metadata.topic}...")
+            
+            conocimiento_guardado = get_from_github(metadata.topic)
+            
+            if conocimiento_guardado:
+                respuesta_final = await answer_question_with_context(
+                    question=entry.core_content,
+                    knowledge_context=conocimiento_guardado
+                )
+            else:
+                respuesta_final = f"Me preguntas sobre '{metadata.topic}', pero aún no tienes notas guardadas sobre este tema en tu Segundo Cerebro. ¿Quieres que guarde algo al respecto?"
             
         elif metadata.action == 'save':
             try:
