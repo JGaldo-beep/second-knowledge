@@ -8,10 +8,10 @@ from dotenv import load_dotenv
 from processors import process_voice, process_image, process_url
 from models import NormalizedEntry
 from datetime import datetime
-from storage import save_to_github, get_from_github
+from storage import save_to_github, get_from_github, get_all_topics
 from agent import analyze_knowledge, answer_question_with_context
 
-from database import init_db, save_message, get_chat_history, get_all_topics
+from database import init_db, save_message, get_chat_history
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 r = redis.from_url(REDIS_URL, decode_responses=True)
